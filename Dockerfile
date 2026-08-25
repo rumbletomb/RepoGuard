@@ -10,13 +10,14 @@ ARG GRYPE_VERSION=0.85.0
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git python3 python3-venv \
     && python3 -m venv /opt/security-tools \
     && /opt/security-tools/bin/pip install --no-cache-dir semgrep==1.99.0 checkov==3.2.340 \
-    && curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}" \
-    && curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks \
-    && curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "v${SYFT_VERSION}" \
-    && curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "v${GRYPE_VERSION}" \
     && ln -s /opt/security-tools/bin/semgrep /usr/local/bin/semgrep \
     && ln -s /opt/security-tools/bin/checkov /usr/local/bin/checkov \
     && rm -rf /var/lib/apt/lists/*
+RUN curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}"
+RUN curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
+RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "v${SYFT_VERSION}"
+RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "v${GRYPE_VERSION}"
+RUN trivy --version && gitleaks version && syft version && grype version && semgrep --version && checkov --version
 WORKDIR /app
 COPY --from=build /app .
 RUN mkdir /data && chown $APP_UID:$APP_UID /data
