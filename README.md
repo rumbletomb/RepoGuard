@@ -101,4 +101,3 @@ Version 1.0 scans repositories already available on the host or mounted read-onl
 ## License
 
 MIT. See [LICENSE](LICENSE).
-

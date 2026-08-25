@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RepoGuard · DevSecOps control plane</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header><div class="brand"><span class="shield">◆</span> RepoGuard</div><span class="badge">DEVSECOPS CONTROL PLANE</span></header>
+  <main>
+    <section class="hero"><div><p class="eyebrow">CONTINUOUS REPOSITORY SECURITY</p><h1>Know what ships.<br><span>Block what shouldn't.</span></h1><p>Scan source, secrets, containers and configuration with a policy gate your team can understand.</p></div><button id="refresh">↻ Refresh dashboard</button></section>
+    <section class="metrics" id="metrics"></section>
+    <section class="grid">
+      <article><div class="section-title"><h2>Repositories</h2><button id="addRepo">+ Connect local repo</button></div><div id="repos" class="empty">No repositories connected.</div></article>
+      <article><div class="section-title"><h2>Latest findings</h2><span id="policy"></span></div><div id="findings" class="empty">Run a scan to see findings.</div></article>
+    </section>
+  </main>
+  <dialog id="repoDialog"><form method="dialog" id="repoForm"><h2>Connect repository</h2><label>Name<input name="name" required placeholder="payments-api"></label><label>Absolute local path<input name="path" required placeholder="/workspace/payments-api"></label><div class="actions"><button value="cancel">Cancel</button><button value="default" id="saveRepo">Connect</button></div><p id="formError" class="error"></p></form></dialog>
+  <script src="/app.js"></script>
+</body></html>

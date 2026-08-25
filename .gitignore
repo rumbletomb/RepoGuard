@@ -1,0 +1,6 @@
+**/bin/
+**/obj/
+.vs/
+data/
+*.user
+TestResults/
