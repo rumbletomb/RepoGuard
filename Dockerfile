@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && python3 -m venv /opt/security-tools \
     && /opt/security-tools/bin/pip install --no-cache-dir semgrep==1.99.0 checkov==3.2.340 \
     && curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}" \
-    && curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/scripts/install.sh | sh -s -- -b /usr/local/bin "v${GITLEAKS_VERSION}" \
+    && curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks \
     && curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "v${SYFT_VERSION}" \
     && curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "v${GRYPE_VERSION}" \
     && ln -s /opt/security-tools/bin/semgrep /usr/local/bin/semgrep \
