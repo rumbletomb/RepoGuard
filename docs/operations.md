@@ -40,7 +40,7 @@ Poll `GET /api/health`. A successful response confirms the process can serve req
 
 The Compose definition and Dockerfile implement:
 
-- non-root UID 10001
+- non-root application UID supplied by the official .NET runtime image
 - read-only root filesystem
 - writable named data volume only
 - temporary in-memory `/tmp`
@@ -58,7 +58,7 @@ When running in Docker, use the container path `/repositories/...`, not the host
 
 ### State cannot be written
 
-Ensure the directory containing `REPOGUARD_DATA` exists and is writable by the application identity. In the supplied image, `/data` belongs to UID 10001.
+Ensure the directory containing `REPOGUARD_DATA` exists and is writable by the application identity. In the supplied image, `/data` belongs to the official .NET image's non-root application UID.
 
 ### Scan rejects a large repository
 

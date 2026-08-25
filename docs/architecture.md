@@ -61,7 +61,7 @@ The dashboard is static HTML/CSS/JavaScript with no build toolchain. All untrust
 - Repository mounts should be read-only.
 - Limits bound file count and individual text-file size.
 - Generated, dependency, binary, and build-output content is excluded.
-- Docker runs UID 10001, drops all capabilities, forbids privilege escalation, and uses a read-only root filesystem.
+- Docker runs with the non-root UID supplied by the official .NET image, drops all capabilities, forbids privilege escalation, and uses a read-only root filesystem.
 - The application has no outbound-network requirement.
 
 ## Scaling path
