@@ -28,7 +28,7 @@ Security tools often emit incompatible formats and leave release decisions to ma
 Requirements: Docker 24+ with Compose v2.
 
 ```bash
-git clone <your-repository-url> repoguard
+git clone https://github.com/rumbletomb/RepoGuard.git repoguard
 cd repoguard
 REPOSITORY_ROOT=/absolute/path/to/repos docker compose up --build
 ```
@@ -101,3 +101,4 @@ Version 1.0 scans repositories already available on the host or mounted read-onl
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
