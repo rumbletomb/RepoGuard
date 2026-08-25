@@ -10,7 +10,7 @@ ARG SYFT_VERSION=1.18.1
 ARG GRYPE_VERSION=0.85.0
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git python3 python3-venv \
     && python3 -m venv /opt/security-tools \
-    && /opt/security-tools/bin/pip install --no-cache-dir semgrep==1.99.0 checkov==3.2.340 \
+    && /opt/security-tools/bin/pip install --no-cache-dir semgrep==1.99.0 checkov==3.2.340 "setuptools<81" \
     && ln -s /opt/security-tools/bin/semgrep /usr/local/bin/semgrep \
     && ln -s /opt/security-tools/bin/checkov /usr/local/bin/checkov \
     && rm -rf /var/lib/apt/lists/*
