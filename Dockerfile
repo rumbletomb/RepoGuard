@@ -4,7 +4,7 @@ COPY . .
 RUN dotnet publish src/RepoGuard.Api/RepoGuard.Api.csproj -c Release -o /app --no-self-contained
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
-ARG TRIVY_VERSION=0.58.1
+ARG TRIVY_VERSION=0.69.3
 ARG GITLEAKS_VERSION=8.23.3
 ARG SYFT_VERSION=1.18.1
 ARG GRYPE_VERSION=0.85.0
