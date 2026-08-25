@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet publish src/RepoGuard.Api/RepoGuard.Api.csproj -c Release -o /app --no-self-contained
+
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 ARG TRIVY_VERSION=0.58.1
 ARG GITLEAKS_VERSION=8.23.3
@@ -13,11 +14,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && ln -s /opt/security-tools/bin/semgrep /usr/local/bin/semgrep \
     && ln -s /opt/security-tools/bin/checkov /usr/local/bin/checkov \
     && rm -rf /var/lib/apt/lists/*
-RUN curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}"
+RUN curl -fsSL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" | tar -xz -C /usr/local/bin trivy
 RUN curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "v${SYFT_VERSION}"
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "v${GRYPE_VERSION}"
 RUN trivy --version && gitleaks version && syft version && grype version && semgrep --version && checkov --version
+
 WORKDIR /app
 COPY --from=build /app .
 RUN mkdir /data && chown $APP_UID:$APP_UID /data
@@ -26,4 +28,3 @@ ENV ASPNETCORE_URLS=http://+:8080 REPOGUARD_DATA=/data/repoguard.json REPOGUARD_
     PATH="/opt/security-tools/bin:${PATH}" SEMGREP_SEND_METRICS=off HOME=/data TRIVY_CACHE_DIR=/data/cache/trivy GRYPE_DB_CACHE_DIR=/data/cache/grype
 EXPOSE 8080
 ENTRYPOINT ["dotnet","RepoGuard.Api.dll"]
-
