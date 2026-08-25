@@ -10,10 +10,10 @@ ARG GRYPE_VERSION=0.85.0
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git python3 python3-venv \
     && python3 -m venv /opt/security-tools \
     && /opt/security-tools/bin/pip install --no-cache-dir semgrep==1.99.0 checkov==3.2.340 \
-    && curl -fsSL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" | tar -xz -C /usr/local/bin trivy \
-    && curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks \
-    && curl -fsSL "https://github.com/anchore/syft/releases/download/v${SYFT_VERSION}/syft_${SYFT_VERSION}_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin syft \
-    && curl -fsSL "https://github.com/anchore/grype/releases/download/v${GRYPE_VERSION}/grype_${GRYPE_VERSION}_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin grype \
+    && curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin "v${TRIVY_VERSION}" \
+    && curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/scripts/install.sh | sh -s -- -b /usr/local/bin "v${GITLEAKS_VERSION}" \
+    && curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "v${SYFT_VERSION}" \
+    && curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "v${GRYPE_VERSION}" \
     && ln -s /opt/security-tools/bin/semgrep /usr/local/bin/semgrep \
     && ln -s /opt/security-tools/bin/checkov /usr/local/bin/checkov \
     && rm -rf /var/lib/apt/lists/*
@@ -25,3 +25,4 @@ ENV ASPNETCORE_URLS=http://+:8080 REPOGUARD_DATA=/data/repoguard.json REPOGUARD_
     PATH="/opt/security-tools/bin:${PATH}" SEMGREP_SEND_METRICS=off HOME=/data TRIVY_CACHE_DIR=/data/cache/trivy GRYPE_DB_CACHE_DIR=/data/cache/grype
 EXPOSE 8080
 ENTRYPOINT ["dotnet","RepoGuard.Api.dll"]
+
