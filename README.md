@@ -1,6 +1,6 @@
-# RepoGuard
+# RepoGuard 2.0
 
-RepoGuard is a self-hosted DevSecOps control plane that scans local source repositories, normalizes security findings, evaluates release policy, and exports results as SARIF. It ships with a responsive dashboard and has no database or cloud dependency.
+RepoGuard is a self-hosted DevSecOps control plane that combines native analysis, six industry scanners, CycloneDX SBOM generation and live OSV advisory correlation behind one normalized API and policy gate.
 
 ![Status](https://img.shields.io/badge/status-production--ready-brightgreen) ![.NET](https://img.shields.io/badge/.NET-10-512bd4) ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -20,6 +20,10 @@ Security tools often emit incompatible formats and leave release decisions to ma
 - File count, file size, generated-directory, and binary safety controls
 - Non-root, read-only, capability-free container deployment
 - Dependency-free test harness and GitHub Actions CI
+- Gitleaks, Semgrep, Trivy, Checkov, Syft and Grype orchestration
+- OSV-backed CVE/advisory correlation and persistent detection catalog
+- Signed GitHub App webhooks for push and pull-request scans
+- Scanner isolation controls, bounded output and graceful degradation
 
 ## Quick start
 
@@ -34,6 +38,8 @@ REPOSITORY_ROOT=/absolute/path/to/repos docker compose up --build
 ```
 
 Open <http://localhost:8080>. Repositories are visible inside the container under `/repositories`; for example `/repositories/payments-api`.
+
+The image bundles all six external scanners. On first use, tools that maintain vulnerability databases may download current advisory data and therefore require outbound HTTPS.
 
 On PowerShell:
 
@@ -81,6 +87,10 @@ The suite covers finding detection, directory exclusions, pass/fail policies, de
 - [REST API reference](docs/api.md)
 - [Rule catalog](docs/rules.md)
 - [Operations and deployment](docs/operations.md)
+- [Scanner engine](docs/scanner-engine.md)
+- [GitHub App setup](docs/github-app.md)
+- [Advisory database and OSV](docs/advisory-database.md)
+- [Versioning and migration](docs/versioning.md)
 - [Development and contribution](CONTRIBUTING.md)
 - [Security policy and boundaries](SECURITY.md)
 
@@ -96,7 +106,14 @@ docs/                    architecture, API, rules and operations
 
 ## Current scope
 
-Version 1.0 scans repositories already available on the host or mounted read-only into the container. It is intended for internal, administrator-operated use. It does not clone untrusted remote repositories, execute repository code, or provide internet-facing authentication. Deploy behind an authenticated identity-aware proxy when used by a team; see the operations guide.
+Version 2.0 supports local/manual scans and signed GitHub push or pull-request jobs. Scanner subprocesses receive bounded arguments, execution time and output. Repository source is never executed intentionally; nevertheless, scanners process hostile input and production deployments should run workers with strict container and network isolation. Deploy behind an authenticated identity-aware proxy; see the operations guide.
+
+## Version history
+
+- `v1.0.0`: deterministic native scanner and original API.
+- `v2.0.0`: multi-scanner engine, SBOM, OSV and GitHub App automation.
+
+Every release remains available through Git tags and GitHub Releases.
 
 ## License
 

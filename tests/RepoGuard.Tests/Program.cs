@@ -1,4 +1,8 @@
 using RepoGuard.Api;
+using RepoGuard.Api.Engine;
+using RepoGuard.Api.GitHub;
+using System.Security.Cryptography;
+using System.Text;
 
 var tests = new List<(string, Func<Task>)>
 {
@@ -7,7 +11,12 @@ var tests = new List<(string, Func<Task>)>
     ("policy blocks critical findings", PolicyBlocks),
     ("policy accepts clean scan", PolicyPasses),
     ("fingerprints are stable", StableFingerprint),
-    ("SARIF contains rule and location", SarifIsValid)
+    ("SARIF contains rule and location", SarifIsValid),
+    ("webhook signature accepts authentic payload", WebhookSignatureAccepts),
+    ("webhook signature rejects tampering", WebhookSignatureRejects),
+    ("push webhook is normalized", WebhookIsParsed),
+    ("finding normalization is deterministic", NormalizationIsStable),
+    ("missing scanner is reported safely", MissingScannerIsSafe)
 };
 var failed = 0;
 foreach (var (name, test) in tests)
@@ -54,6 +63,28 @@ static Task SarifIsValid()
     var scan = new ScanRecord(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, "abc", "failed", 1, [finding], new(false,["x"]));
     var json = System.Text.Json.JsonSerializer.Serialize(SarifExporter.Create(scan));
     Assert(json.Contains("2.1.0") && json.Contains("RG101") && json.Contains("startLine"), "Invalid SARIF structure"); return Task.CompletedTask;
+}
+static Task WebhookSignatureAccepts()
+{
+    var body=Encoding.UTF8.GetBytes("{\"ok\":true}");var secret="test-webhook-secret";var signature="sha256="+Convert.ToHexString(HMACSHA256.HashData(Encoding.UTF8.GetBytes(secret),body)).ToLowerInvariant();
+    Assert(GitHubWebhookParser.Verify(body,signature,secret),"Valid signature rejected");return Task.CompletedTask;
+}
+static Task WebhookSignatureRejects()
+{
+    var body=Encoding.UTF8.GetBytes("{\"ok\":true}");Assert(!GitHubWebhookParser.Verify(body,"sha256=00","secret"),"Tampered signature accepted");return Task.CompletedTask;
+}
+static Task WebhookIsParsed()
+{
+    var body=Encoding.UTF8.GetBytes("""{"after":"abcdef","repository":{"full_name":"acme/api","clone_url":"https://github.com/acme/api.git"},"installation":{"id":42}}""");var job=GitHubWebhookParser.Parse("delivery-1","push",body);
+    Assert(job is not null&&job.Repository=="acme/api"&&job.Ref=="abcdef"&&job.InstallationId==42,"Webhook was not normalized");return Task.CompletedTask;
+}
+static Task NormalizationIsStable()
+{
+    var a=FindingFactory.Create("tool","R1","sast",Severity.High,"Title","Description","src/a.cs",7,"Fix");var b=FindingFactory.Create("tool","R1","sast",Severity.High,"Title","Description","src/a.cs",7,"Fix");Assert(a.Fingerprint==b.Fingerprint,"Fingerprint changed");return Task.CompletedTask;
+}
+static async Task MissingScannerIsSafe()
+{
+    var result=await new SafeCommandRunner().Run("repoguard-definitely-missing-executable",[],System.IO.Path.GetTempPath(),TimeSpan.FromSeconds(1),default);Assert(result.ExitCode==-127,"Missing executable was not classified");
 }
 static void Assert(bool condition, string message) { if (!condition) throw new Exception(message); }
 

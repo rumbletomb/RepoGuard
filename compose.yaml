@@ -4,6 +4,10 @@ services:
     ports: ["8080:8080"]
     environment:
       REPOGUARD_DATA: /data/repoguard.json
+      REPOGUARD_ARTIFACTS: /data/artifacts
+      GitHub__WebhookSecret: ${GITHUB_WEBHOOK_SECRET:-}
+      GitHub__AppId: ${GITHUB_APP_ID:-}
+      GitHub__PrivateKeyPem: ${GITHUB_PRIVATE_KEY_PEM:-}
     volumes:
       - repoguard-data:/data
       - ${REPOSITORY_ROOT:-./examples}:/repositories:ro

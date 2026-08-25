@@ -38,8 +38,22 @@ public sealed class JsonStore
 
     private async Task<DataState> ReadUnsafe(CancellationToken ct)
     {
-        if (!File.Exists(_path)) return new([], [], new Policy());
+        if (!File.Exists(_path)) { var fresh=new DataState([], [], new Policy()); fresh.Rules.AddRange(DefaultRules()); return fresh; }
         var json = await File.ReadAllTextAsync(_path, ct);
-        return JsonSerializer.Deserialize<DataState>(json, Json) ?? new([], [], new Policy());
+        var state=JsonSerializer.Deserialize<DataState>(json, Json) ?? new([], [], new Policy());
+        if(state.Rules.Count==0)state.Rules.AddRange(DefaultRules());
+        return state;
     }
+
+    private static IEnumerable<DetectionRule> DefaultRules() =>
+    [
+        new("native-v2","native","sast",Severity.High,"Built-in deterministic baseline rules.","2.0.0"),
+        new("gitleaks","gitleaks","secret",Severity.High,"Credential and secret patterns.","external"),
+        new("semgrep-auto","semgrep","sast",Severity.High,"Language-aware static analysis.","external"),
+        new("trivy-fs","trivy","dependency",Severity.High,"Dependencies, secrets and misconfiguration.","external"),
+        new("checkov-iac","checkov","iac",Severity.High,"Terraform, Kubernetes and cloud IaC policies.","external"),
+        new("syft-cdx","syft","sbom",Severity.Info,"CycloneDX software bill of materials.","external"),
+        new("grype-sbom","grype","dependency",Severity.High,"SBOM vulnerability matching.","external"),
+        new("osv-v1","osv","dependency",Severity.High,"Live OSV advisory correlation.","v1")
+    ];
 }

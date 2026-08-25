@@ -7,6 +7,10 @@
 | `REPOGUARD_DATA` | `data/repoguard.json` | Absolute or working-directory-relative state file |
 | `ASPNETCORE_URLS` | framework default | Listen URL; container sets `http://+:8080` |
 | `REPOSITORY_ROOT` | `./examples` in Compose interpolation | Host directory mounted read-only at `/repositories` |
+| `REPOGUARD_ARTIFACTS` | `data/artifacts` | SBOM and bounded scanner artifacts |
+| `GitHub__WebhookSecret` | none | HMAC secret; required for webhooks |
+| `GitHub__AppId` | none | GitHub App numeric identifier |
+| `GitHub__PrivateKeyPem` | none | GitHub App PEM key supplied by secret manager |
 
 ## Storage and backup
 
@@ -22,6 +26,8 @@ The only mutable asset is the state JSON at `REPOGUARD_DATA`. Stop the process o
 6. Block public ingress to the application port.
 7. Collect process logs without repository source or credential values.
 8. Back up state and test restoration.
+9. Allow only required outbound HTTPS for scanner databases, OSV and GitHub APIs.
+10. Monitor the per-scanner status returned in every v2 scan.
 
 Example reverse-proxy topology:
 
